@@ -1,0 +1,62 @@
+[Unit]
+Description=OpenSearch
+Documentation=https://opensearch.org
+
+[Service]
+Type=simple
+RuntimeDirectory=opensearch
+PrivateTmp=true
+Environment=PYTHONWARNINGS="ignore"
+Environment=OPENSEARCH_HOME={{ opensearch_path }}
+Environment=OPENSEARCH_PATH_CONF={{ opensearch_config_path }}
+Environment=PID_DIR={{ opensearch_pid_dir }}
+Environment=OPENSEARCH_SD_NOTIFY=true
+Environment=OPENSEARCH_TMPDIR={{ opensearch_path }}/tmp
+EnvironmentFile=-/etc/default/opensearch
+
+WorkingDirectory={{ opensearch_path }}
+
+User={{ opensearch_user }}
+Group={{ opensearch_group }}
+
+ExecStart={{ opensearch_bin_file }} -p ${PID_DIR}/opensearch.pid --quiet
+
+StandardOutput=journal
+StandardError=inherit
+
+# Specifies the maximum file descriptor number that can be opened by this process
+LimitNOFILE=65535
+
+# Specifies the maximum number of processes
+LimitNPROC=4096
+
+# Specifies the maximum size of virtual memory
+LimitAS=infinity
+
+LimitMEMLOCK=infinity
+
+# Specifies the maximum file size
+LimitFSIZE=infinity
+
+# Disable timeout logic and wait until process is stopped
+TimeoutStopSec=0
+
+# SIGTERM signal is used to stop the Java process
+KillSignal=SIGTERM
+
+# Send the signal only to the JVM rather than its control group
+KillMode=process
+
+# Java process is never killed
+SendSIGKILL=no
+
+# When a JVM receives a SIGTERM signal it exits with code 143
+SuccessExitStatus=143
+
+# Allow a slow startup before the systemd notifier module kicks in to extend the timeout
+TimeoutStartSec=75
+
+TimeoutSec=900
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,69 @@
+---
+- name: Ensure SSL Path is created
+  ansible.builtin.file:
+    path: "{{ ssl_path }}"
+    state: directory
+    owner: "{{ opensearch_user }}"
+    group: "{{ opensearch_group }}"
+    mode: "0600"
+
+- name: Generate CA Certificates
+  block:
+    - name: Check if CA File exists
+      ansible.builtin.stat:
+        path: "{{ ssl_path }}/{{ ssl_root_ca_key_name }}"
+      register: ca_file
+    
+    - name: Generate CA Key if not exists
+      shell: |
+        openssl genrsa -out {{ ssl_root_ca_key_name }} {{ ssl_root_ca_size }}
+        chown {{ opensearch_user }}:{{ opensearch_group }} {{ ssl_root_ca_key_name }}
+      args:
+        chdir: "{{ ssl_path }}"
+      when: not ca_file.stat.exists
+    
+    - name: Generate CA Cert
+      shell: |
+        openssl req -new -x509 -sha256 -key {{ ssl_root_ca_key_name }} -subj "{{ ssl_root_subject }}" -out {{ ssl_root_ca_cert_name }} -days {{ ssl_root_ca_days }}
+        chown {{ opensearch_user }}:{{ opensearch_group }} {{ ssl_root_ca_cert_name }}
+      args:
+        chdir: "{{ ssl_path }}"
+      when: not ca_file.stat.exists
+  when: hostvars[groups[ansible_master_group][0]].inventory_hostname == inventory_hostname
+
+- name: Generate Admin Certificates
+  block:
+    - name: Check if Admin Key File exists
+      ansible.builtin.stat:
+        path: "{{ ssl_path }}/{{ ssl_admin_key_name }}"
+      register: admin_file
+    
+    - name: Generate Admin Key if not exists
+      shell: |
+        openssl genrsa -out {{ ssl_admin_key_name }}-tmp {{ ssl_root_ca_size }}
+        openssl pkcs8 -inform PEM -outform PEM -in {{ ssl_admin_key_name }}-tmp -topk8 -nocrypt -v1 PBE-SHA1-3DES -out {{ ssl_admin_key_name }}
+        rm -f {{ ssl_admin_key_name }}-tmp
+        chown {{ opensearch_user }}:{{ opensearch_group }} {{ ssl_admin_key_name }}
+      args:
+        chdir: "{{ ssl_path }}"
+      when: not admin_file.stat.exists
+    
+    - name: Generate Admin Cert
+      shell: |
+        openssl req -new -key {{ ssl_admin_key_name }} -subj "{{ ssl_admin_subject }}" -out {{ ssl_admin_key_name }}.csr
+        openssl x509 -req -in {{ ssl_admin_key_name }}.csr -CA {{ ssl_root_ca_cert_name }} -CAkey {{ ssl_root_ca_key_name }} -CAcreateserial -sha256 -out {{ ssl_admin_cert_name }} -days {{ ssl_admin_days }}
+        rm -f {{ ssl_admin_key_name }}.csr
+        chown {{ opensearch_user }}:{{ opensearch_group }} {{ ssl_admin_cert_name }}
+      args:
+        chdir: "{{ ssl_path }}"
+      when: not admin_file.stat.exists
+  
+  when: hostvars[groups[ansible_master_group][0]].inventory_hostname == inventory_hostname
+
+- name: Generate Master Nodes Certificates
+  include_tasks: nodes_certificates.yml
+  loop: "{{ groups[ansible_master_group] | map('extract', hostvars, 'inventory_hostname') }}"
+
+- name: Generate Data Nodes Certificates
+  include_tasks: nodes_certificates.yml
+  loop: "{{ groups[ansible_data_group] | map('extract', hostvars, 'inventory_hostname') }}"

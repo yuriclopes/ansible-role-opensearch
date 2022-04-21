@@ -1,0 +1,117 @@
+---
+- name: "[Configure] Create systemd file"
+  ansible.builtin.template:
+    src: "{{ opensearch_service_name }}.j2"
+    dest: "{{ systemd_path }}/{{ opensearch_service_name }}"
+    owner: root
+    group: root
+    mode: '0644'
+  tags:
+    - install
+    - configure
+  notify: 
+    - Daemon Reload
+    - Enable service
+    - Restart service
+
+- name: "[Configure] Applying sysctl parameters"
+  sysctl:
+    name: '{{ item.key }}'
+    value: '{{ item.value }}'
+    sysctl_set: yes
+    state: present
+    reload: yes
+    ignoreerrors: yes
+  with_dict: '{{ opensearch_sysctl }}'
+  tags:
+    - install
+    - configure
+
+# - name: "[Configure] Copy Certs"
+#   ansible.builtin.copy:
+#     dest: "{{ opensearch_config_path }}/{{ item.dest }}"
+#     content: "{{ item.content }}"
+#     owner: "{{ opensearch_user }}"
+#     group: "{{ opensearch_group }}"
+#     mode: 0600
+#   with_items:
+#     - dest: node-key.pem
+#       content: "{{ vault_node_key_pem }}"
+#     - dest: node.pem
+#       content: "{{ vault_node_pem }}"
+#     - dest: root-ca.pem
+#       content: "{{ vault_root_ca_pem }}"
+#     - dest: admin.pem
+#       content: "{{ vault_admin_pem }}"
+#     - dest: admin-key.pem
+#       content: "{{ vault_admin_key_pem }}"
+#   tags:
+#     - install
+#     - configure
+#   notify: 
+#     - Restart service
+
+- name: "[Configure] Create config"
+  ansible.builtin.template:
+    src: "opensearch.yml.j2"
+    dest: "{{ opensearch_config_path }}/opensearch.yml"
+    owner: root
+    group: "{{ opensearch_group }}"
+    mode: '0660'
+  vars:
+    master_node_list: "{{ groups[ansible_master_group] | map('extract', hostvars, ['ansible_host']) }}"
+  tags:
+    - install
+    - configure
+  notify: 
+    - Restart service
+
+# - name: "[Configure] Copy batch_metrics_enabled.conf"
+#   ansible.builtin.copy:
+#     src: "batch_metrics_enabled.conf"
+#     dest: "{{ opensearch_path }}/data/batch_metrics_enabled.conf"
+#     owner: "{{ opensearch_user }}"
+#     group: "{{ opensearch_group }}"
+#     mode: '0644'
+#   tags:
+#     - install
+#     - configure
+
+# - name: "[Configure] Create config.yml security file"
+#   ansible.builtin.template:
+#     src: config.yml.j2
+#     dest: "{{ opensearch_path }}/plugins/opensearch-security/securityconfig/config.yml"
+#     owner: "{{ opensearch_user }}"
+#     group: "{{ opensearch_group }}"
+#     mode: '0640'
+#   tags:
+#     - install
+#     - configure
+#   notify:
+#     - Restart service
+
+# - name: Create roles_mapping.yml file
+#   ansible.builtin.template:
+#     src: roles_mapping.yml.j2
+#     dest: "{{ opensearch_path }}/plugins/opensearch-security/securityconfig/roles_mapping.yml"
+#     owner: "{{ opensearch_user }}"
+#     group: "{{ opensearch_group }}"
+#     mode: '0640'
+#   tags:
+#     - install
+#     - configure
+#   notify:
+#     - Restart service
+
+# - name: Create internal_users.yml file
+#   ansible.builtin.template:
+#     src: internal_users.yml.j2
+#     dest: "{{ opensearch_path }}/plugins/opensearch-security/securityconfig/internal_users.yml"
+#     owner: "{{ opensearch_user }}"
+#     group: "{{ opensearch_group }}"
+#     mode: '0640'
+#   tags:
+#     - install
+#     - configure
+#   notify:
+#     - Restart service

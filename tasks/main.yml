@@ -1,0 +1,24 @@
+---
+- name: Load a variable file based on the OS type
+  ansible.builtin.include_vars: 
+    file: "{{ ansible_os_family }}.yml"
+  tags:
+    - install
+    - configure
+
+# - name: Include OpenSearch Installation tasks
+#   include_tasks: "install.yml"
+#   tags:
+#     - install
+
+- name: Include OpenSearch Certificates tasks
+  include_tasks: "main_certificates.yml"
+  tags:
+    - install
+    - configure
+
+# - name: Include OpenSearch Configuration tasks
+#   include_tasks: "configure.yml"
+#   tags:
+#     - install
+#     - configure

@@ -1,0 +1,8 @@
+---
+- name: Converge
+  hosts: opensearch
+  become: yes
+  tasks:
+    - name: "Include opensearch"
+      ansible.builtin.include_role:
+        name: "yuriclopes.opensearch"

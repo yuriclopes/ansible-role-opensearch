@@ -1,0 +1,39 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  - name: opensearch-master
+    image: "${MOLECULE_IMAGE:-yuriclopes/debian-molecule-test:11-slim}"
+    command: "${IMAGE_COMMAND:-/sbin/init}"
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+    pre_build_image: true
+    groups:
+      - opensearch
+      - opensearch_master
+  - name: opensearch-data
+    image: "${MOLECULE_IMAGE:-yuriclopes/debian-molecule-test:11-slim}"
+    command: "${IMAGE_COMMAND:-/sbin/init}"
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+    pre_build_image: true
+    groups:
+      - opensearch
+      - opensearch_data
+provisioner:
+  name: ansible
+  inventory:
+    host_vars:
+      opensearch-master:
+        ansible_host: opensearch-master
+      opensearch-data:
+        ansible_host: opensearch-data
+    group_vars:
+      opensearch:
+        ansible_user: ansible
+verifier:
+  name: ansible

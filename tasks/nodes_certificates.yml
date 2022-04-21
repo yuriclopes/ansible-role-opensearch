@@ -1,0 +1,29 @@
+---
+- name: Generate Node Certificate
+  block:
+    - name: Check if Node Key File exists
+      ansible.builtin.stat:
+        path: "{{ ssl_path }}/{{ item }}.pem"
+      register: node_file
+    
+    - name: Generate Node Key if not exists
+      shell: |
+        openssl genrsa -out {{ item }}-tmp {{ ssl_root_ca_size }}
+        openssl pkcs8 -inform PEM -outform PEM -in {{ item }}-tmp -topk8 -nocrypt -v1 PBE-SHA1-3DES -out {{ item }}.pem
+        rm -f {{ item }}-tmp
+        chown {{ opensearch_user }}:{{ opensearch_group }} {{ item }}.pem
+      args:
+        chdir: "{{ ssl_path }}"
+      when: not node_file.stat.exists
+    
+    - name: Generate Admin Cert
+      shell: |
+        openssl req -new -key {{ item }}.pem -subj "{{ ssl_nodes_subject }}" -out {{ item }}.csr
+        openssl x509 -req -in {{ item }}.csr -CA {{ ssl_root_ca_cert_name }} -CAkey {{ ssl_root_ca_key_name }} -CAcreateserial -sha256 -out {{ item }}.pem -days {{ ssl_nodes_days }}
+        rm -f {{ item }}.csr
+        chown {{ opensearch_user }}:{{ opensearch_group }} {{ ssl_admin_cert_name }}
+      args:
+        chdir: "{{ ssl_path }}"
+      when: not node_file.stat.exists
+  
+  when: hostvars[groups[ansible_master_group][0]].inventory_hostname == inventory_hostname

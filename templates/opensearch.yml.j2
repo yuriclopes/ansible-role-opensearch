@@ -1,0 +1,64 @@
+cluster:
+  name: {{ cluster_name }}
+{% if is_bootstrapping is defined %}
+  initial_master_nodes:
+{% for master_nodes in master_node_list %}
+  - {{ master_nodes }}
+{% endfor %}
+{% endif %}
+
+node:
+  name: {{ inventory_hostname }}
+  master: {{ "true" if ansible_master_group in group_names else "false" }}
+  data: {{ "true" if ansible_data_group in group_names else "false" }}
+
+path:
+  data: {{ path_data }}
+  logs: {{ path_logs }}
+
+bootstrap:
+  memory_lock: {{ bootstrap_memory_lock | string | lower }}
+
+network:
+  host: {{ ansible_all_ipv4_addresses | ipaddr('private') | first }}
+
+http:
+  port: {{ http_port | default(9200) }}
+  enabled: {{ http_enabled | default('false') | string | lower }}
+
+discovery:
+  seed_hosts:
+{% for master_nodes in master_node_list %}
+  - {{ master_nodes }}
+{% endfor %}
+
+plugins.security.ssl.transport.pemcert_filepath: {{ security_ssl_transport_pemcert_filepath }}
+plugins.security.ssl.transport.pemkey_filepath: {{ security_ssl_transport_pemkey_filepath }}
+plugins.security.ssl.transport.pemtrustedcas_filepath: {{ security_ssl_transport_pemtrustedcas_filepath }}
+plugins.security.ssl.transport.enforce_hostname_verification: {{ security_ssl_transport_enforce_hostname_verification }}
+plugins.security.ssl.http.enabled: {{ security_ssl_http_enabled }}
+plugins.security.ssl.http.pemcert_filepath: {{ security_ssl_http_pemcert_filepath }}
+plugins.security.ssl.http.pemkey_filepath: {{ security_ssl_http_pemkey_filepath }}
+plugins.security.ssl.http.pemtrustedcas_filepath: {{ security_ssl_http_pemtrustedcas_filepath }}
+plugins.security.allow_unsafe_democertificates: {{ security_allow_unsafe_democertificates }}
+plugins.security.allow_default_init_securityindex: {{ security_allow_default_init_securityindex }}
+plugins.security.authcz.admin_dn:
+{% for admin_dn in security_authcz_admin_dn %}
+  - {{ admin_dn }}
+{% endfor %}
+plugins.security.nodes_dn:
+{% for nodes_dn in security_nodes_dn %}
+  - {{ nodes_dn }}
+{% endfor %}
+plugins.security.audit.type: {{ security_audit_type }}
+plugins.security.enable_snapshot_restore_privilege: {{ security_enable_snapshot_restore_privilege }}
+plugins.security.check_snapshot_restore_write_privileges: {{ security_check_snapshot_restore_write_privileges }}
+plugins.security.restapi.roles_enabled:
+{% for roles_enabled in security_restapi_roles_enabled %}
+  - {{ roles_enabled }}
+{% endfor %}
+plugins.security.system_indices.enabled: {{ security_system_indices_enabled }}
+plugins.security.system_indices.indices: 
+{% for indices in security_system_indices_indices %}
+  - {{ indices }}
+{% endfor %}
