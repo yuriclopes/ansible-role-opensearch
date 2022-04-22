@@ -1,6 +1,6 @@
 ---
 - name: "[SSL] Set Master Node SSL Member"
-  set_fact:
+  ansible.builtin.set_fact:
     ssl_master_node_member: "{{ hostvars[groups[ansible_master_group][0]] }}"
 
 - name: "[SSL] Check if CA File exists"
@@ -69,7 +69,7 @@
   when: 
     - ssl_master_node_member.inventory_hostname == inventory_hostname
 
-- name: "[SSL] Copy ALL Certificates to all {{ansible_master_group}} members"
+- name: "[SSL] Copy ALL Certificates to all {{ ansible_master_group }} members"
   ansible.builtin.copy:
     src: "{{ item }}"
     dest: "{{ ssl_path }}/"
@@ -81,7 +81,7 @@
     - ssl_master_node_member.inventory_hostname != inventory_hostname
     - ansible_master_group in group_names
 
-- name: "[SSL] Copy Node Certificates to {{ansible_data_group}} members"
+- name: "[SSL] Copy Node Certificates to {{ ansible_data_group }} members"
   ansible.builtin.copy:
     src: "{{ item }}"
     dest: "{{ ssl_path }}/"
@@ -93,7 +93,7 @@
     - ssl_master_node_member.inventory_hostname != inventory_hostname
     - ansible_data_group in group_names
 
-- name: "[SSL] Copy CA Certificates to {{ansible_data_group}} members"
+- name: "[SSL] Copy CA Certificates to {{ ansible_data_group }} members"
   ansible.builtin.copy:
     src: "/tmp/ansible-opensearch-{{ cluster_name }}/{{ ssl_root_ca_cert_name }}"
     dest: "{{ ssl_path }}/"

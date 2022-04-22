@@ -5,6 +5,10 @@ ansible_data_group: opensearch_data
 cluster_name: example
 http_port: 9200
 
+# Set Xms and Xmx custom value. Default TOTAL RAM / 2
+xms_memory_in_mb: "{{ ansible_memtotal_mb / 2 }}"
+xmx_memory_in_mb: "{{ ansible_memtotal_mb / 2 }}"
+
 path_data: /var/lib/opensearch
 path_logs: /var/log/opensearch
 

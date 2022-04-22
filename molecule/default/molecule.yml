@@ -65,5 +65,7 @@ provisioner:
           - cert_name: molecule-2
             days: 7
         is_bootstrapping: true
+        xms_memory_in_mb: 256
+        xmx_memory_in_mb: 256
 verifier:
   name: ansible

@@ -1,24 +1,24 @@
 ---
 - name: Daemon Reload
-  systemd:
+  ansible.builtin.systemd:
     daemon_reload: yes
 
 - name: Enable service
-  systemd:
+  ansible.builtin.systemd:
     name: "{{ opensearch_service_name }}"
     enabled: yes
 
 - name: Start service
-  systemd:
+  ansible.builtin.systemd:
     name: "{{ opensearch_service_name }}"
     state: started
 
 - name: Stop service
-  systemd:
+  ansible.builtin.systemd:
     name: "{{ opensearch_service_name }}"
     state: stopped
 
 - name: Restart service
-  systemd:
+  ansible.builtin.systemd:
     name: "{{ opensearch_service_name }}"
     state: restarted

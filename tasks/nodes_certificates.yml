@@ -6,7 +6,7 @@
   when: ssl_master_node_member.inventory_hostname == inventory_hostname
 
 - name: "[SSL NODE] Generate Node Key if not exists"
-  shell: |
+  ansible.builtin.shell: |
     openssl genrsa -out {{ item }}-key-tmp {{ ssl_root_ca_size }}
     openssl pkcs8 -inform PEM -outform PEM -in {{ item }}-key-tmp -topk8 -nocrypt -v1 PBE-SHA1-3DES -out {{ item }}-key.pem
     openssl req -new -key {{ item }}-key.pem -subj "{{ ssl_subject | replace('%REPLACE_CN%', item) }}" -out {{ item }}.csr

@@ -1,6 +1,6 @@
 ---
 - name: "[Configure] Set Master Node SSL Member"
-  set_fact:
+  ansible.builtin.set_fact:
     ssl_master_node_member: "{{ hostvars[groups[ansible_master_group][0]] }}"
 
 - name: "[Configure] Get OpenSSL Subject"
@@ -46,11 +46,24 @@
   ansible.builtin.template:
     src: "opensearch.yml.j2"
     dest: "{{ opensearch_config_path }}/opensearch.yml"
-    owner: root
+    owner: "{{ opensearch_user }}"
     group: "{{ opensearch_group }}"
     mode: '0660'
   vars:
     master_node_list: "{{ groups[ansible_master_group] | map('extract', hostvars, ['node_address']) }}"
+  tags:
+    - install
+    - configure
+  notify: 
+    - Restart service
+
+- name: "[Configure] Create jvm.options file"
+  ansible.builtin.template:
+    src: "jvm.options.j2"
+    dest: "{{ opensearch_config_path }}/jvm.options"
+    owner: "{{ opensearch_user }}"
+    group: "{{ opensearch_group }}"
+    mode: '0660'
   tags:
     - install
     - configure

@@ -9,7 +9,7 @@
     - install
 
 - name: "[Install] Create the {{ opensearch_group }} group"
-  group:
+  ansible.builtin.group:
     name: "{{ opensearch_group }}"
     state: present
     system: true
@@ -17,7 +17,7 @@
     - install
 
 - name: "[Install] Create the {{ opensearch_user }} user"
-  user:
+  ansible.builtin.user:
     name: "{{ opensearch_user }}"
     groups: "{{ opensearch_group }}"
     append: true
@@ -28,14 +28,14 @@
     - install
 
 - name: "[Install] Check if versions already exists"
-  stat: 
+  ansible.builtin.stat: 
     path: "{{ opensearch_path }}-{{ opensearch_version }}"
   register: installed_path
   tags:
     - install
 
 - name: "[Install] Download Binary"
-  get_url:
+  ansible.builtin.get_url:
     url: "{{ opensearch_package_url }}"
     dest: "/tmp/opensearch-{{ opensearch_version }}-linux-x64.tar.gz"
     mode: '0644'
@@ -48,7 +48,7 @@
     - install
 
 - name: "[Install] Unpack binary"
-  unarchive:
+  ansible.builtin.unarchive:
     src: "/tmp/opensearch-{{ opensearch_version }}-linux-x64.tar.gz"
     dest: "{{ opensearch_install_path }}"
     owner: "{{ opensearch_user }}"
@@ -90,24 +90,27 @@
     - install
 
 - name: "[Install] Get config path"
-  stat: 
+  ansible.builtin.stat: 
     path: "{{ opensearch_config_path }}"
   register: config_path
   tags:
     - install
 
 - name: "[Install] Move config to {{ opensearch_config_path }}"
-  command: mv "{{ opensearch_path }}/config" "{{ opensearch_config_path }}"
+  ansible.builtin.command: mv "{{ opensearch_path }}/config" "{{ opensearch_config_path }}"
   when: not config_path.stat.exists
   tags:
     - install
 
 - name: "[Install] Create profile.d"
-  copy:
+  ansible.builtin.copy:
     dest: /etc/profile.d/opensearch.sh
     content: |
       export OPENSEARCH_HOME={{ opensearch_path }}
       export OPENSEARCH_PATH_CONF={{ opensearch_config_path }}
+    owner: "{{ opensearch_user }}"
+    group: "{{ opensearch_group }}"
+    mode: "0740"
   tags:
     - install
 
