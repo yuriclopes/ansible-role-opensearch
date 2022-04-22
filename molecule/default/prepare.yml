@@ -1,0 +1,8 @@
+---
+- name: Prepare
+  hosts: all
+  become: yes
+  tasks:   
+    - name: Add /etc/hosts name resolution 
+      ansible.builtin.shell: echo "{{ hostvars[item].ansible_all_ipv4_addresses | ipaddr('private') | first }} {{ hostvars[item].node_address }}" >> /etc/hosts
+      with_items: "{{ groups.all }}"

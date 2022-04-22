@@ -4,7 +4,6 @@ ansible_data_group: opensearch_data
 
 cluster_name: example
 http_port: 9200
-http_enabled: false
 
 path_data: /var/lib/opensearch
 path_logs: /var/log/opensearch
@@ -12,28 +11,23 @@ path_logs: /var/log/opensearch
 bootstrap_memory_lock: true
 
 ssl_path: "{{ opensearch_config_path }}/ssl"
+ssl_subject: "/CN=%REPLACE_CN%/OU=UNIT/O=ORG/L=SAOPAULO/ST=SAOPAULO/C=BR"
 ssl_root_ca_key_name: root-ca-key.pem
 ssl_root_ca_cert_name: root-ca.pem
-ssl_root_subject: "/C=BR/ST=SAOPAULO/L=SAOPAULO/O=ORG/OU=UNIT/CN=ROOT"
 ssl_root_ca_size: 2048
 ssl_root_ca_days: 3650
+ssl_root_cn: ROOT
 ssl_admin_key_name: admin-key.pem
 ssl_admin_cert_name: admin.pem
-ssl_admin_subject: "/C=BR/ST=SAOPAULO/L=SAOPAULO/O=ORG/OU=UNIT/CN=ADMIN"
 ssl_admin_days: 3650
-ssl_nodes_subject: "/C=BR/ST=SAOPAULO/L=SAOPAULO/O=ORG/OU=UNIT/CN={{ inventory_hostname }}"
+ssl_admin_cn: ADMIN
 ssl_nodes_days: 3650
 
 ssl_clients: []
 
-security_ssl_transport_pemcert_filepath: "{{ inventory_hostname }}.pem"
-security_ssl_transport_pemkey_filepath: "{{ inventory_hostname }}-key.pem"
-security_ssl_transport_pemtrustedcas_filepath: "{{ ssl_root_ca_cert_name }}"
+
 security_ssl_transport_enforce_hostname_verification: false
 security_ssl_http_enabled: true
-security_ssl_http_pemcert_filepath: "{{ inventory_hostname }}.pem"
-security_ssl_http_pemkey_filepath: "{{ inventory_hostname }}-key.pem"
-security_ssl_http_pemtrustedcas_filepath: "{{ ssl_root_ca_cert_name }}"
 security_allow_unsafe_democertificates: true
 security_allow_default_init_securityindex: true
 security_authcz_admin_dn:

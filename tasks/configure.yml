@@ -1,4 +1,19 @@
 ---
+- name: "[Configure] Set Master Node SSL Member"
+  set_fact:
+    ssl_master_node_member: "{{ hostvars[groups[ansible_master_group][0]] }}"
+
+- name: "[Configure] Get OpenSSL Subject"
+  ansible.builtin.shell: openssl x509 -subject -nameopt RFC2253 -noout -in {{ ssl_path }}/{{ inventory_hostname }}.pem
+  register: final_node_ssl_subject
+  changed_when: false
+
+- name: "[Configure] Get Admin OpenSSL Subject"
+  ansible.builtin.shell: openssl x509 -subject -nameopt RFC2253 -noout -in {{ ssl_path }}/{{ ssl_admin_cert_name }}
+  register: final_admin_ssl_subject
+  when: ssl_master_node_member.inventory_hostname == inventory_hostname
+  changed_when: false
+
 - name: "[Configure] Create systemd file"
   ansible.builtin.template:
     src: "{{ opensearch_service_name }}.j2"
@@ -15,7 +30,7 @@
     - Restart service
 
 - name: "[Configure] Applying sysctl parameters"
-  sysctl:
+  ansible.builtin.sysctl:
     name: '{{ item.key }}'
     value: '{{ item.value }}'
     sysctl_set: yes
@@ -27,31 +42,7 @@
     - install
     - configure
 
-# - name: "[Configure] Copy Certs"
-#   ansible.builtin.copy:
-#     dest: "{{ opensearch_config_path }}/{{ item.dest }}"
-#     content: "{{ item.content }}"
-#     owner: "{{ opensearch_user }}"
-#     group: "{{ opensearch_group }}"
-#     mode: 0600
-#   with_items:
-#     - dest: node-key.pem
-#       content: "{{ vault_node_key_pem }}"
-#     - dest: node.pem
-#       content: "{{ vault_node_pem }}"
-#     - dest: root-ca.pem
-#       content: "{{ vault_root_ca_pem }}"
-#     - dest: admin.pem
-#       content: "{{ vault_admin_pem }}"
-#     - dest: admin-key.pem
-#       content: "{{ vault_admin_key_pem }}"
-#   tags:
-#     - install
-#     - configure
-#   notify: 
-#     - Restart service
-
-- name: "[Configure] Create config"
+- name: "[Configure] Create opensearch.yml file"
   ansible.builtin.template:
     src: "opensearch.yml.j2"
     dest: "{{ opensearch_config_path }}/opensearch.yml"
@@ -59,7 +50,7 @@
     group: "{{ opensearch_group }}"
     mode: '0660'
   vars:
-    master_node_list: "{{ groups[ansible_master_group] | map('extract', hostvars, ['ansible_host']) }}"
+    master_node_list: "{{ groups[ansible_master_group] | map('extract', hostvars, ['node_address']) }}"
   tags:
     - install
     - configure

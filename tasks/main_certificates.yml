@@ -18,7 +18,7 @@
 - name: "[SSL] Generate CA Key and Certificate"
   ansible.builtin.shell: |
     openssl genrsa -out {{ ssl_root_ca_key_name }} {{ ssl_root_ca_size }}
-    openssl req -new -x509 -sha256 -key {{ ssl_root_ca_key_name }} -subj "{{ ssl_root_subject }}" -out {{ ssl_root_ca_cert_name }} -days {{ ssl_root_ca_days }}
+    openssl req -new -x509 -sha256 -key {{ ssl_root_ca_key_name }} -subj "{{ ssl_subject | replace('%REPLACE_CN%', ssl_root_cn) }}" -out {{ ssl_root_ca_cert_name }} -days {{ ssl_root_ca_days }}
     chown {{ opensearch_user }}:{{ opensearch_group }} {{ ssl_root_ca_key_name }} {{ ssl_root_ca_cert_name }}
     chmod 600 {{ ssl_root_ca_key_name }} {{ ssl_root_ca_cert_name }}
   args:
@@ -31,7 +31,7 @@
   ansible.builtin.shell: |
     openssl genrsa -out {{ ssl_admin_key_name }}-tmp {{ ssl_root_ca_size }}
     openssl pkcs8 -inform PEM -outform PEM -in {{ ssl_admin_key_name }}-tmp -topk8 -nocrypt -v1 PBE-SHA1-3DES -out {{ ssl_admin_key_name }}
-    openssl req -new -key {{ ssl_admin_key_name }} -subj "{{ ssl_admin_subject }}" -out {{ ssl_admin_key_name }}.csr
+    openssl req -new -key {{ ssl_admin_key_name }} -subj "{{ ssl_subject | replace('%REPLACE_CN%', ssl_admin_cn) }}" -out {{ ssl_admin_key_name }}.csr
     openssl x509 -req -in {{ ssl_admin_key_name }}.csr -CA {{ ssl_root_ca_cert_name }} -CAkey {{ ssl_root_ca_key_name }} -CAcreateserial -sha256 -out {{ ssl_admin_cert_name }} -days {{ ssl_admin_days }}
     rm -f {{ ssl_admin_key_name }}.csr {{ ssl_admin_key_name }}-tmp
     chown {{ opensearch_user }}:{{ opensearch_group }} {{ ssl_admin_key_name }} {{ ssl_admin_cert_name }}
@@ -111,3 +111,4 @@
   changed_when: false
   delegate_to: localhost
   become: no
+  run_once: yes

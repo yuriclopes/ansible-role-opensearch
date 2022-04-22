@@ -9,7 +9,7 @@
   shell: |
     openssl genrsa -out {{ item }}-key-tmp {{ ssl_root_ca_size }}
     openssl pkcs8 -inform PEM -outform PEM -in {{ item }}-key-tmp -topk8 -nocrypt -v1 PBE-SHA1-3DES -out {{ item }}-key.pem
-    openssl req -new -key {{ item }}-key.pem -subj "{{ ssl_nodes_subject }}" -out {{ item }}.csr
+    openssl req -new -key {{ item }}-key.pem -subj "{{ ssl_subject | replace('%REPLACE_CN%', item) }}" -out {{ item }}.csr
     openssl x509 -req -in {{ item }}.csr -CA {{ ssl_root_ca_cert_name }} -CAkey {{ ssl_root_ca_key_name }} -CAcreateserial -sha256 -out {{ item }}.pem -days {{ ssl_nodes_days }}
     rm -f {{ item }}.csr {{ item }}-key-tmp
     chown {{ opensearch_user }}:{{ opensearch_group }} {{ item }}-key.pem {{ item }}.pem

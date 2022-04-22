@@ -167,4 +167,4 @@
     state: directory
     owner: "{{ opensearch_user }}"
     group: "{{ opensearch_group }}"
-    mode: "0600"
+    mode: "0740"

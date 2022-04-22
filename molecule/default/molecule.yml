@@ -49,22 +49,21 @@ provisioner:
   inventory:
     host_vars:
       opensearch-master-0:
-        ansible_host: opensearch-master-0
+        node_address: opensearch-master-0
       opensearch-master-1:
-        ansible_host: opensearch-master-1
+        node_address: opensearch-master-1
       opensearch-data-0:
-        ansible_host: opensearch-data-0
+        node_address: opensearch-data-0
       opensearch-data-1:
-        ansible_host: opensearch-data-1
+        node_address: opensearch-data-1
     group_vars:
       opensearch:
         ansible_user: ansible
         ssl_clients:
           - cert_name: molecule-1
             days: 7
-            sub: "/C=BR/ST=SAOPAULO/L=SAOPAULO/O=ORG/OU=UNIT/CN=MOLECULE-1"
           - cert_name: molecule-2
             days: 7
-            sub: "/C=BR/ST=SAOPAULO/L=SAOPAULO/O=ORG/OU=UNIT/CN=MOLECULE-2"
+        is_bootstrapping: true
 verifier:
   name: ansible
