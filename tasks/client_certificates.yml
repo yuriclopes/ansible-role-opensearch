@@ -1,0 +1,21 @@
+---
+- name: Check if Client Key File exists
+  ansible.builtin.stat:
+    path: "{{ ssl_path }}/{{ item.cert_name }}-key.pem"
+  register: client_file
+  when: ssl_master_node_member.inventory_hostname == inventory_hostname
+
+- name: Generate Client Key if not exists
+  shell: |
+    openssl genrsa -out {{ item.cert_name }}-key-tmp {{ ssl_root_ca_size }}
+    openssl pkcs8 -inform PEM -outform PEM -in {{ item.cert_name }}-key-tmp -topk8 -nocrypt -v1 PBE-SHA1-3DES -out {{ item.cert_name }}-key.pem
+    openssl req -new -key {{ item.cert_name }}-key.pem -subj "{{ item.sub }}" -out {{ item.cert_name }}.csr
+    openssl x509 -req -in {{ item.cert_name }}.csr -CA {{ ssl_root_ca_cert_name }} -CAkey {{ ssl_root_ca_key_name }} -CAcreateserial -sha256 -out {{ item.cert_name }}.pem -days {{ item.days }}
+    rm -f {{ item.cert_name }}.csr {{ item.cert_name }}-key-tmp
+    chown {{ opensearch_user }}:{{ opensearch_group }} {{ item.cert_name }}-key.pem {{ item.cert_name }}.pem
+    chmod 600 {{ item.cert_name }}-key.pem {{ item.cert_name }}.pem
+  args:
+    chdir: "{{ ssl_path }}"
+  when:
+    - ssl_master_node_member.inventory_hostname == inventory_hostname
+    - not hostvars[groups[ansible_master_group][0]].client_file.stat.exists

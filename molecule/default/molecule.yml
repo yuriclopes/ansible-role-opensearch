@@ -4,7 +4,7 @@ dependency:
 driver:
   name: docker
 platforms:
-  - name: opensearch-master
+  - name: opensearch-master-0
     image: "${MOLECULE_IMAGE:-yuriclopes/debian-molecule-test:11-slim}"
     command: "${IMAGE_COMMAND:-/sbin/init}"
     volumes:
@@ -14,7 +14,27 @@ platforms:
     groups:
       - opensearch
       - opensearch_master
-  - name: opensearch-data
+  - name: opensearch-master-1
+    image: "${MOLECULE_IMAGE:-yuriclopes/debian-molecule-test:11-slim}"
+    command: "${IMAGE_COMMAND:-/sbin/init}"
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+    pre_build_image: true
+    groups:
+      - opensearch
+      - opensearch_master
+  - name: opensearch-data-0
+    image: "${MOLECULE_IMAGE:-yuriclopes/debian-molecule-test:11-slim}"
+    command: "${IMAGE_COMMAND:-/sbin/init}"
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+    pre_build_image: true
+    groups:
+      - opensearch
+      - opensearch_data
+  - name: opensearch-data-1
     image: "${MOLECULE_IMAGE:-yuriclopes/debian-molecule-test:11-slim}"
     command: "${IMAGE_COMMAND:-/sbin/init}"
     volumes:
@@ -28,12 +48,23 @@ provisioner:
   name: ansible
   inventory:
     host_vars:
-      opensearch-master:
-        ansible_host: opensearch-master
-      opensearch-data:
-        ansible_host: opensearch-data
+      opensearch-master-0:
+        ansible_host: opensearch-master-0
+      opensearch-master-1:
+        ansible_host: opensearch-master-1
+      opensearch-data-0:
+        ansible_host: opensearch-data-0
+      opensearch-data-1:
+        ansible_host: opensearch-data-1
     group_vars:
       opensearch:
         ansible_user: ansible
+        ssl_clients:
+          - cert_name: molecule-1
+            days: 7
+            sub: "/C=BR/ST=SAOPAULO/L=SAOPAULO/O=ORG/OU=UNIT/CN=MOLECULE-1"
+          - cert_name: molecule-2
+            days: 7
+            sub: "/C=BR/ST=SAOPAULO/L=SAOPAULO/O=ORG/OU=UNIT/CN=MOLECULE-2"
 verifier:
   name: ansible

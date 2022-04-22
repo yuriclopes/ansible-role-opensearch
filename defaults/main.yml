@@ -11,8 +11,6 @@ path_logs: /var/log/opensearch
 
 bootstrap_memory_lock: true
 
-generate_certificates: true
-
 ssl_path: "{{ opensearch_config_path }}/ssl"
 ssl_root_ca_key_name: root-ca-key.pem
 ssl_root_ca_cert_name: root-ca.pem
@@ -23,9 +21,10 @@ ssl_admin_key_name: admin-key.pem
 ssl_admin_cert_name: admin.pem
 ssl_admin_subject: "/C=BR/ST=SAOPAULO/L=SAOPAULO/O=ORG/OU=UNIT/CN=ADMIN"
 ssl_admin_days: 3650
-
-ssl_nodes_days: 3650
 ssl_nodes_subject: "/C=BR/ST=SAOPAULO/L=SAOPAULO/O=ORG/OU=UNIT/CN={{ inventory_hostname }}"
+ssl_nodes_days: 3650
+
+ssl_clients: []
 
 security_ssl_transport_pemcert_filepath: "{{ inventory_hostname }}.pem"
 security_ssl_transport_pemkey_filepath: "{{ inventory_hostname }}-key.pem"

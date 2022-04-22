@@ -160,3 +160,11 @@
     mode: '0740'
   tags:
     - install
+
+- name: "[Install] Create SSL Path"
+  ansible.builtin.file:
+    path: "{{ ssl_path }}"
+    state: directory
+    owner: "{{ opensearch_user }}"
+    group: "{{ opensearch_group }}"
+    mode: "0600"

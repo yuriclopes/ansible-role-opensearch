@@ -6,10 +6,10 @@
     - install
     - configure
 
-# - name: Include OpenSearch Installation tasks
-#   include_tasks: "install.yml"
-#   tags:
-#     - install
+- name: Include OpenSearch Installation tasks
+  include_tasks: "install.yml"
+  tags:
+    - install
 
 - name: Include OpenSearch Certificates tasks
   include_tasks: "main_certificates.yml"
