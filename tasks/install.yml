@@ -161,6 +161,7 @@
     group: "{{ opensearch_group }}"
     state: directory
     mode: '0740'
+  changed_when: false
   tags:
     - install
 
