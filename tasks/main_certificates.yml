@@ -64,6 +64,7 @@
     src: "{{ item }}"
     dest: "/tmp/ansible-opensearch-{{ cluster_name }}/"
     flat: yes
+  changed_when: false
   loop: "{{ files_to_copy.files | map(attribute='path') }}" 
   when: 
     - ssl_master_node_member.inventory_hostname == inventory_hostname
@@ -102,3 +103,11 @@
   when: 
     - ssl_master_node_member.inventory_hostname != inventory_hostname
     - ansible_data_group in group_names
+
+- name: "[SSL] Remove temporary folder"
+  ansible.builtin.file:
+    path: "/tmp/ansible-opensearch-{{ cluster_name }}/"
+    state: absent
+  changed_when: false
+  delegate_to: localhost
+  become: no
