@@ -3,8 +3,26 @@
 
 - name: Verify
   hosts: all
-  gather_facts: false
+  gather_facts: true
   tasks:
-  - name: Example assertion
-    ansible.builtin.assert:
-      that: true
+    - name: "Load all defaults files"
+      ansible.builtin.include_vars:
+        dir: "../../defaults/"
+
+    - name: Get OpenSearch Cluster status
+      uri:
+        url: "https://{{ inventory_hostname }}:{{ http_port }}/_cluster/stats?pretty"
+        url_username: admin
+        url_password: admin
+        force_basic_auth: yes
+        validate_certs: no
+      register: status_query
+
+    - name: Assert that cluster is Green with all members
+      assert:
+        that:
+          - status_query.json.status == 'green'
+          - status_query.json.nodes.count.data == 2
+          - status_query.json.nodes.count.master == 2
+          - status_query.json.nodes.count.total == 4
+          - status_query.json.nodes.count.ingest == 4
