@@ -1,37 +1,38 @@
 ---
-ansible_master_group: opensearch_master
-ansible_data_group: opensearch_data
+ansible_master_group: opensearch_master # Ansible Group used to identify wich nodes should be Master Node
+ansible_data_group: opensearch_data # Ansible Group used to identify wich nodes should be Data Node
 
-cluster_name: example
-http_port: 9200
+cluster_name: example # OpenSearch Cluster Name
+http_port: 9200 # OpenSearch Listener Port
 
 # Set Xms and Xmx custom value. Default TOTAL RAM / 2
-xms_memory_in_mb: "{{ ansible_memtotal_mb / 2 }}"
-xmx_memory_in_mb: "{{ ansible_memtotal_mb / 2 }}"
+xms_memory_in_mb: "{{ ansible_memtotal_mb / 2 }}" # Amount of XMS Memory to be defined in jvm.options file
+xmx_memory_in_mb: "{{ ansible_memtotal_mb / 2 }}" # Amount of XMX Memory to be defined in jvm.options file
 
-path_data: /var/lib/opensearch
-path_logs: /var/log/opensearch
+path_data: /var/lib/opensearch # OpenSearch Data Path
+path_logs: /var/log/opensearch # OpenSearch Log Path
 
-bootstrap_memory_lock: true
+bootstrap_memory_lock: true # Defines if bootstrap_memory_lock will be enabled
 
-ssl_path: "{{ opensearch_config_path }}/ssl"
-ssl_subject: "/CN=%REPLACE_CN%/OU=UNIT/O=ORG/L=SAOPAULO/ST=SAOPAULO/C=BR"
-ssl_root_ca_key_name: root-ca-key.pem
-ssl_root_ca_cert_name: root-ca.pem
-ssl_root_ca_size: 2048
-ssl_root_ca_days: 3650
-ssl_root_cn: ROOT
-ssl_admin_key_name: admin-key.pem
-ssl_admin_cert_name: admin.pem
-ssl_admin_days: 3650
-ssl_admin_cn: ADMIN
-ssl_nodes_days: 3650
+ssl_path: "{{ opensearch_config_path }}/ssl" # Path where SSL Certificates will be placed
+ssl_subject: "/CN=%REPLACE_CN%/OU=UNIT/O=ORG/L=SAOPAULO/ST=SAOPAULO/C=BR" # SSL PATTERN to be signed to certificats. The CN value must contains %REPLACE_CN% to works 
+ssl_root_ca_key_name: root-ca-key.pem # Name of root-ca key. If not exists will be created
+ssl_root_ca_cert_name: root-ca.pem # Name of root-ca cert. If not exists will be created
+ssl_root_ca_size: 2048 # Certificate size
+ssl_root_ca_days: 3650 # Certificate days expiration
+ssl_root_cn: ROOT # CN to be applied in root-ca
+ssl_admin_key_name: admin-key.pem # Name of admin key (if not exists, will be created)
+ssl_admin_cert_name: admin.pem # Name of admin certificate (if not exists, will be created)
+ssl_admin_days: 3650 # Admin certificate expiration in days
+ssl_admin_cn: ADMIN # Admin certificate CN
+ssl_clients: [] # List of Client certificates
 
-ssl_clients: []
-
+ssl_nodes_days: 3650 # Node certificate expiration in days
+ssl_nodes_individual_certs: true # Defines if should be create individual certificates to nodes or a single certificate.
 
 security_ssl_transport_enforce_hostname_verification: false
 security_ssl_http_enabled: true
+security_ssl_http_clientauth_mode: OPTIONAL
 security_allow_unsafe_democertificates: true
 security_allow_default_init_securityindex: true
 security_authcz_admin_dn:
@@ -54,3 +55,8 @@ security_system_indices_indices:
   - ".opendistro-notebooks"
   - ".opendistro-asynchronous-search-response*"
   - ".opendistro-reports-*"
+
+config_clientcert_auth_domain_http_enabled: true
+config_clientcert_auth_domain_transport_enabled: true
+config_clientcert_auth_domain_order: 1
+config_clientcert_auth_domain_http_authenticator_config_username_attribute: cn

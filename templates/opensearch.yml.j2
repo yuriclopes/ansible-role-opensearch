@@ -39,17 +39,22 @@ plugins.security.ssl.http.enabled: {{ security_ssl_http_enabled }}
 plugins.security.ssl.http.pemcert_filepath: {{ ssl_path }}/{{ inventory_hostname }}.pem
 plugins.security.ssl.http.pemkey_filepath: {{ ssl_path }}/{{ inventory_hostname }}-key.pem
 plugins.security.ssl.http.pemtrustedcas_filepath: {{ ssl_path }}/{{ ssl_root_ca_cert_name }}
+plugins.security.ssl.http.clientauth_mode: {{ security_ssl_http_clientauth_mode }}
 plugins.security.allow_unsafe_democertificates: {{ security_allow_unsafe_democertificates }}
 plugins.security.allow_default_init_securityindex: {{ security_allow_default_init_securityindex }}
 plugins.security.authcz.admin_dn:
   - '{{ hostvars[groups[ansible_master_group][0]].final_admin_ssl_subject.stdout | replace('subject=', '') }}'
 plugins.security.nodes_dn:
+{% if ssl_nodes_individual_certs %}
 {% for master_node_dn in groups[ansible_master_group] | map('extract', hostvars, 'final_node_ssl_subject') %}
   - '{{ master_node_dn.stdout | replace('subject=', '') }}'
 {% endfor %}
+{% endif %}
+{% if ssl_nodes_individual_certs %}
 {% for data_node_dn in groups[ansible_data_group] | map('extract', hostvars, 'final_node_ssl_subject') %}
   - '{{ data_node_dn.stdout | replace('subject=', '') }}'
 {% endfor %}
+{% endif %}
 plugins.security.audit.type: {{ security_audit_type }}
 plugins.security.enable_snapshot_restore_privilege: {{ security_enable_snapshot_restore_privilege }}
 plugins.security.check_snapshot_restore_write_privileges: {{ security_check_snapshot_restore_write_privileges }}
