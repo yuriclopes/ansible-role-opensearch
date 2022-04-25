@@ -3,10 +3,12 @@
   ansible.builtin.set_fact:
     ssl_master_node_member: "{{ hostvars[groups[ansible_master_group][0]] }}"
 
-- name: "[Configure] Get OpenSSL Subject"
-  ansible.builtin.shell: openssl x509 -subject -nameopt RFC2253 -noout -in {{ ssl_path }}/{{ inventory_hostname }}.pem
+- name: "[Configure] Get OpenSSL Subject using Node Address (DNS)"
+  ansible.builtin.shell: openssl x509 -subject -nameopt RFC2253 -noout -in {{ ssl_path }}/{{ node_address }}.pem
   register: final_node_ssl_subject
   changed_when: false
+  when:
+    - ssl_nodes_individual_certs
 
 - name: "[Configure] Get Admin OpenSSL Subject"
   ansible.builtin.shell: openssl x509 -subject -nameopt RFC2253 -noout -in {{ ssl_path }}/{{ ssl_admin_cert_name }}
