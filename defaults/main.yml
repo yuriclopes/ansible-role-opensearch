@@ -28,7 +28,7 @@ ssl_admin_cn: ADMIN # Admin certificate CN
 ssl_clients: [] # List of Client certificates
 
 ssl_nodes_days: 3650 # Node certificate expiration in days
-ssl_nodes_individual_certs = true # Defines if should be create individual certificates to nodes or a single certificate.
+ssl_nodes_individual_certs: true # Defines if should be create individual certificates to nodes or a single certificate.
 
 security_ssl_transport_enforce_hostname_verification: false
 security_ssl_http_enabled: true
