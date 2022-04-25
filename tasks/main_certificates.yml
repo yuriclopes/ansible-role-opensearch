@@ -44,13 +44,13 @@
 
 - name: Generate Master Nodes Certificates
   ansible.builtin.include_tasks: nodes_certificates.yml
-  loop: "{{ groups[ansible_master_group] | map('extract', hostvars, 'inventory_hostname') }}"
+  loop: "{{ groups[ansible_master_group] | map('extract', hostvars, 'node_address') }}"
   when:
     - ssl_nodes_individual_certs
 
 - name: Generate Data Nodes Certificates
   ansible.builtin.include_tasks: nodes_certificates.yml
-  loop: "{{ groups[ansible_data_group] | map('extract', hostvars, 'inventory_hostname') }}"
+  loop: "{{ groups[ansible_data_group] | map('extract', hostvars, 'node_address') }}"
   when:
     - ssl_nodes_individual_certs
 
@@ -92,7 +92,7 @@
     owner: "{{ opensearch_user }}"
     group: "{{ opensearch_group }}"
     mode: "0600"
-  with_fileglob: "/tmp/ansible-opensearch-{{ cluster_name }}/{{ inventory_hostname }}*.pem"
+  with_fileglob: "/tmp/ansible-opensearch-{{ cluster_name }}/{{ node_address }}*.pem"
   when: 
     - ssl_nodes_individual_certs
     - ssl_master_node_member.inventory_hostname != inventory_hostname

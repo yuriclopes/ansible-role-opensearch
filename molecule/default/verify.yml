@@ -17,11 +17,11 @@
       environment:
         SSL_CERT_FILE: "{{ ssl_path }}/{{ ssl_root_ca_cert_name }}"
       ansible.builtin.uri:
-        url: "https://{{ inventory_hostname }}:{{ http_port }}/_cluster/stats?pretty"
+        url: "https://{{ node_address }}:{{ http_port }}/_cluster/stats?pretty"
         url_username: admin
         url_password: admin
-        client_cert: "{{ ssl_path }}/molecule-1.pem"
-        client_key: "{{ ssl_path }}/molecule-1-key.pem"
+        client_cert: "{{ ssl_path }}/admin.pem"
+        client_key: "{{ ssl_path }}/admin-key.pem"
         force_basic_auth: yes
       register: status_query
       become: yes
