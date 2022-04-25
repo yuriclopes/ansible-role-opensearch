@@ -11,6 +11,7 @@ opensearch_pid_dir: "/var/run/opensearch"
 opensearch_bin_file: "{{ opensearch_path }}/bin/opensearch"
 opensearch_plugin_bin_file: "{{ opensearch_path }}/bin/opensearch-plugin"
 opensearch_keystore_bin_file: "{{ opensearch_path }}/bin/opensearch-keystore"
+opensearch_securityconfig_path: "{{ opensearch_path }}/plugins/opensearch-security/securityconfig"
 opensearch_user: opensearch
 opensearch_group: opensearch
 opensearch_service_name: opensearch.service

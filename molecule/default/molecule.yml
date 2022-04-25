@@ -62,10 +62,9 @@ provisioner:
         ssl_clients:
           - cert_name: molecule-1
             days: 7
-          - cert_name: molecule-2
-            days: 7
         is_bootstrapping: true
         xms_memory_in_mb: 256
         xmx_memory_in_mb: 256
+        security_ssl_http_clientauth_mode: REQUIRE
 verifier:
   name: ansible

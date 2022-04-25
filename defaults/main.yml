@@ -32,6 +32,7 @@ ssl_nodes_individual_certs: true # Defines if should be create individual certif
 
 security_ssl_transport_enforce_hostname_verification: false
 security_ssl_http_enabled: true
+security_ssl_http_clientauth_mode: OPTIONAL
 security_allow_unsafe_democertificates: true
 security_allow_default_init_securityindex: true
 security_authcz_admin_dn:
@@ -54,3 +55,8 @@ security_system_indices_indices:
   - ".opendistro-notebooks"
   - ".opendistro-asynchronous-search-response*"
   - ".opendistro-reports-*"
+
+config_clientcert_auth_domain_http_enabled: true
+config_clientcert_auth_domain_transport_enabled: true
+config_clientcert_auth_domain_order: 1
+config_clientcert_auth_domain_http_authenticator_config_username_attribute: cn

@@ -39,6 +39,7 @@ plugins.security.ssl.http.enabled: {{ security_ssl_http_enabled }}
 plugins.security.ssl.http.pemcert_filepath: {{ ssl_path }}/{{ inventory_hostname }}.pem
 plugins.security.ssl.http.pemkey_filepath: {{ ssl_path }}/{{ inventory_hostname }}-key.pem
 plugins.security.ssl.http.pemtrustedcas_filepath: {{ ssl_path }}/{{ ssl_root_ca_cert_name }}
+plugins.security.ssl.http.clientauth_mode: {{ security_ssl_http_clientauth_mode }}
 plugins.security.allow_unsafe_democertificates: {{ security_allow_unsafe_democertificates }}
 plugins.security.allow_default_init_securityindex: {{ security_allow_default_init_securityindex }}
 plugins.security.authcz.admin_dn:

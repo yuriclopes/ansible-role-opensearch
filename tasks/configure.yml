@@ -70,6 +70,19 @@
   notify: 
     - Restart service
 
+- name: "[Configure] Create security config.yml file"
+  ansible.builtin.template:
+    src: "config.yml.j2"
+    dest: "{{ opensearch_securityconfig_path }}/config.yml"
+    owner: "{{ opensearch_user }}"
+    group: "{{ opensearch_group }}"
+    mode: '0644'
+  tags:
+    - install
+    - configure
+  notify: 
+    - Restart service
+
 # - name: "[Configure] Copy batch_metrics_enabled.conf"
 #   ansible.builtin.copy:
 #     src: "batch_metrics_enabled.conf"
@@ -80,19 +93,6 @@
 #   tags:
 #     - install
 #     - configure
-
-# - name: "[Configure] Create config.yml security file"
-#   ansible.builtin.template:
-#     src: config.yml.j2
-#     dest: "{{ opensearch_path }}/plugins/opensearch-security/securityconfig/config.yml"
-#     owner: "{{ opensearch_user }}"
-#     group: "{{ opensearch_group }}"
-#     mode: '0640'
-#   tags:
-#     - install
-#     - configure
-#   notify:
-#     - Restart service
 
 # - name: Create roles_mapping.yml file
 #   ansible.builtin.template:
