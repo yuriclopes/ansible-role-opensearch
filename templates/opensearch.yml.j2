@@ -8,7 +8,7 @@ cluster:
 {% endif %}
 
 node:
-  name: {{ node_address | default(inventory_hostname) }}
+  name: {{ node_address }}
   master: {{ "true" if ansible_master_group in group_names else "false" }}
   data: {{ "true" if ansible_data_group in group_names else "false" }}
 
