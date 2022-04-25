@@ -1,5 +1,12 @@
----
-- hosts: localhost
-  remote_user: root
+- hosts: opensearch
   roles:
-    - opensearch
+    - yuriclopes.opensearch
+  vars:
+    ansible_user: ansible
+    cluster_name: test-cluster
+    ssl_clients:
+      - cert_name: "test-app.example.com"
+        days: 365
+    xms_memory_in_mb: 4096
+    xmx_memory_in_mb: 4096
+    security_ssl_http_clientauth_mode: REQUIRE

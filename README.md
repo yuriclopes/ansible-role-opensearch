@@ -1,38 +1,52 @@
-Role Name
-=========
+# Ansible Role: OpenSearch
 
-A brief description of the role goes here.
+[![Molecule](https://github.com/yuriclopes/ansible-role-opensearch/actions/workflows/ci.yml/badge.svg)](https://github.com/yuriclopes/ansible-role-opensearch/actions/workflows/ci.yml)
 
-Requirements
-------------
+Installs and configures Opensearch Cluster on Debian/Ubuntu servers.
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+## Requirements (Debian)
 
-Role Variables
---------------
+### APT Packages on Debian target hosts
+- iproute2
+- python3
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
 
-Dependencies
-------------
+* The node role is defined by ansible group. By default `opensearch_master` and `opensearch_data`. Those groups can be changed setting the `ansible_master_group` and `ansible_data_group` respectively.
+* Each ansible host must contains the `node_address` variable. This variable will be used to sign the certificates and configure the opensearch.yml file.
+* All the nodes must be acessible wich other on port 9200-9300.
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
-
-Example Playbook
-----------------
-
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-    - hosts: servers
+```yaml
+    - hosts: all
+      become: yes
       roles:
-         - { role: username.rolename, x: 42 }
+        - role: yuriclopes.opensearch
+      vars:
+        ansible_master_group: opensearch_master
+        ansible_data_group: opensearch_data
+```
 
-License
--------
+## Role Variables
 
-BSD
+Additional variables listed below. Available variables are listed in defaults folder (see `defaults/`):
 
-Author Information
-------------------
+## Dependencies
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+### PIP Packages (requirements.txt)
+- netaddr>=0.7.0
+
+## Example Playbook
+
+```yaml
+    - hosts: all
+      become: yes
+      roles:
+        - role: yuriclopes.opensearch
+```
+
+## License
+
+MIT / BSD
+
+## Author Information
+
+This role was created in 2022 by Yuri Corona Lopes.

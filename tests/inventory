@@ -1,2 +1,27 @@
-localhost
-
+# This will create use 3 Nodes with Master and Data together
+all:
+  hosts:
+    elastic-test-01:
+      ansible_host: 10.0.0.10
+      node_address: elastic-test-01.example.com
+    elastic-test-02:
+      ansible_host: 10.0.0.11
+      node_address: elastic-test-02.example.com
+    elastic-test-03:
+      ansible_host: 10.0.0.12
+      node_address: elastic-test-03.example.com
+  children:
+    opensearch_master:
+      hosts:
+        elastic-test-01:
+        elastic-test-02:
+        elastic-test-03:
+    opensearch_data:
+      hosts:
+        elastic-test-01:
+        elastic-test-02:
+        elastic-test-03:
+    elasticsearch_cluster:
+      children:
+        master_nodes:
+        opensearch_data:

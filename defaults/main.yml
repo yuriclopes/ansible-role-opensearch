@@ -25,7 +25,12 @@ ssl_admin_key_name: admin-key.pem # Name of admin key (if not exists, will be cr
 ssl_admin_cert_name: admin.pem # Name of admin certificate (if not exists, will be created)
 ssl_admin_days: 3650 # Admin certificate expiration in days
 ssl_admin_cn: ADMIN # Admin certificate CN
-ssl_clients: [] # List of Client certificates
+
+# ssl_clients: [] # List of Client certificates
+## Example
+# ssl_clients:
+#   - cert_name: my-aplication
+#     days: 365
 
 ssl_nodes_days: 3650 # Node certificate expiration in days
 ssl_nodes_individual_certs: true # Defines if should be create individual certificates to nodes or a single certificate.
